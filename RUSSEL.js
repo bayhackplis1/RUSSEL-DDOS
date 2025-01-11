@@ -10,7 +10,7 @@ process.setMaxListeners(0);
 require("events").EventEmitter.defaultMaxListeners = 0;
 
 if (process.argv.length < 5) {
-    console.log(`Usage: node tls-v2.js URL TIME REQ_PER_SEC THREADS\nExample: node tls-v2.js https://tls.mrrage.xyz 1000 20 10`);
+    console.log(`Usage: node RUSSEL.js URL TIME REQ_PER_SEC THREADS\nExample: node RUSSEL.js https://olvidatuex.com 1000 20 10`);
     process.exit();
 }
 
