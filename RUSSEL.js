@@ -332,7 +332,6 @@ function protectAgainstDetection(proxyOptions, callback) {
 
 const KillScript = () => process.exit(1);
 
-setTimeout(KillScript, args.time * 1000);
-
 process.on('uncaughtException', error => { console.error(`\x1b[31m[ERROR] Uncaught Exception: ${error}\x1b[0m`); });
 process.on('unhandledRejection', error => { console.error(`\x1b[31m[ERROR] Unhandled Rejection: ${error}\x1b[0m`); });
+
