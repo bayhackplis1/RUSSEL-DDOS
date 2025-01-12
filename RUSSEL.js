@@ -10,8 +10,24 @@ process.setMaxListeners(0);
 require("events").EventEmitter.defaultMaxListeners = 0;
 
 if (process.argv.length < 5) {
-    console.log(`\x1b[33mUsage: node RUSSEL.js URL TIME REQ_PER_SEC THREADS\x1b[0m`);
-    console.log(`\x1b[33mExample: node RUSSEL.js https://olvidatuex.com 1000 20 10\x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m    ┌────────────────────────────────┐   \x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m    |    RUSSEL SCRIPT  ████  ████    |   \x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m    └────────────────────────────────┘   \x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m    -------------------------------   \x1b[0m`);
+    console.log(`\x1b[41m\x1b[37m    Usage: node RUSSEL.js URL TIME REQ_PER_SEC THREADS   \x1b[0m`);
+    console.log(`\x1b[41m\x1b[37m    Example: node RUSSEL.js https://olvidatuex.com 1000 20 10   \x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m    -------------------------------   \x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m    ┌───────┐    ┌────────────┐    ┌────────┐   \x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m    |  /\\  |    |  /\\  \\    |    |   /\\   |   \x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m    | /  \\ |    | /  \\  \\   |    |  /  \\  |   \x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m    |/    \\|    |/    \\  \\  |    | /    \\ |   \x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m    └───────┘    └────────────┘    └────────┘   \x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m     ──────────────█─────────────────██─────  \x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m     ──────────────█───────────────██─────  \x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m     ──────────────██────────────────██─────  \x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m     ──────────────██───────────────██─────  \x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m     SCRIPT CREADO  POR ANTUAN  \x1b[0m`);
+    console.log(`\x1b[42m\x1b[30m     DERECHOS DE AUTOR RESERVADOS   \x1b[0m`);
     process.exit();
 }
 
@@ -334,4 +350,3 @@ const KillScript = () => process.exit(1);
 
 process.on('uncaughtException', error => { console.error(`\x1b[31m[ERROR] Uncaught Exception: ${error}\x1b[0m`); });
 process.on('unhandledRejection', error => { console.error(`\x1b[31m[ERROR] Unhandled Rejection: ${error}\x1b[0m`); });
-
